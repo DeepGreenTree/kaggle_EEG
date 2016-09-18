@@ -109,11 +109,19 @@ input_dims = (batch_size,
               train_data_params['channels'],
               1,
               train_data_params['length'])
+
+
 def build_model():
+    """
+    Build the model
+    """
+
+    # Input layer: batch size, channels, rows, columns
     l_in = nn.layers.InputLayer(input_dims)
 
     conv1 = Conv2DLayer(incoming = l_in, num_filters = 256, filter_size = (1, 9),
-                        stride = 1, border_mode = 'same',
+                        stride=1,
+                        pad='same',
                         W = nn.init.Normal(std = std),
                         nonlinearity = None)
     print 'conv1', nn.layers.get_output_shape(conv1)
@@ -129,7 +137,8 @@ def build_model():
     print 'drop1', nn.layers.get_output_shape(drop1)
 
     conv2 = Conv2DLayer(incoming = drop1, num_filters = 256, filter_size = (1, 1),
-                        stride = 1, border_mode = 'same',
+                                                stride=1,
+pad='same',
                         W = nn.init.Normal(std = std),
                         nonlinearity = None)
     print 'conv2', nn.layers.get_output_shape(conv2)
@@ -139,42 +148,45 @@ def build_model():
     print 'bn2', nn.layers.get_output_shape(bn2)
 
     conv2a = Conv2DLayer(incoming = bn2, num_filters = 256, filter_size = (1, 9),
-                         stride = 1, border_mode = 'same',
+                                                 stride=1,
+pad='same',
                          W = nn.init.Normal(std = std), b = None,
                          nonlinearity = None)
     print 'conv2a', nn.layers.get_output_shape(conv2a)
 
     sum2a = SumLayer(incomings = [conv2, conv2a], coeffs = 1)
     print 'sum2a', nn.layers.get_output_shape(sum2a)
-    
+
     bn2a = BatchNormLayer(incoming = sum2a, epsilon = 0.0000000001,
-                          nonlinearity = nn.nonlinearities.rectify)    
+                          nonlinearity = nn.nonlinearities.rectify)
     print 'bn2a', nn.layers.get_output_shape(bn2a)
 
     conv2b = Conv2DLayer(incoming = bn2a, num_filters = 256, filter_size = (1, 9),
-                         stride = 1, border_mode = 'same',
+                         stride=1,
+                        pad='same',
                          W = conv2a.W, b = None,
                          nonlinearity = None)
     print 'conv2b', nn.layers.get_output_shape(conv2b)
 
     sum2b = SumLayer(incomings = [conv2, conv2b], coeffs = 1)
     print 'sum2b', nn.layers.get_output_shape(sum2b)
-    
+
     bn2b = BatchNormLayer(incoming = sum2b, epsilon = 0.0000000001,
-                          nonlinearity = nn.nonlinearities.rectify)    
+                          nonlinearity = nn.nonlinearities.rectify)
     print 'bn2b', nn.layers.get_output_shape(bn2b)
 
     conv2c = Conv2DLayer(incoming = bn2b, num_filters = 256, filter_size = (1, 9),
-                         stride = 1, border_mode = 'same',
+                         stride=1,
+                        pad='same',
                          W = conv2a.W, b = None,
                          nonlinearity = None)
     print 'conv2c', nn.layers.get_output_shape(conv2c)
 
     sum2c = SumLayer(incomings = [conv2, conv2c], coeffs = 1)
     print 'sum2c', nn.layers.get_output_shape(sum2c)
-    
+
     bn2c = BatchNormLayer(incoming = sum2c, epsilon = 0.0000000001,
-                          nonlinearity = nn.nonlinearities.rectify)    
+                          nonlinearity = nn.nonlinearities.rectify)
     print 'bn2c', nn.layers.get_output_shape(bn2c)
 
     pool2 = Pool2DLayer(incoming = bn2c, pool_size = (1, 4), stride = (1, 4))
@@ -184,7 +196,8 @@ def build_model():
     print 'drop2', nn.layers.get_output_shape(drop2)
 
     conv3 = Conv2DLayer(incoming = drop2, num_filters = 256, filter_size = (1, 1),
-                        stride = 1, border_mode = 'same',
+                        stride=1,
+                        pad='same',
                         W = nn.init.Normal(std = std),
                         nonlinearity = None)
     print 'conv3', nn.layers.get_output_shape(conv3)
@@ -194,42 +207,45 @@ def build_model():
     print 'bn3', nn.layers.get_output_shape(bn3)
 
     conv3a = Conv2DLayer(incoming = bn3, num_filters = 256, filter_size = (1, 9),
-                         stride = 1, border_mode = 'same',
+                         stride=1,
+                        pad='same',
                          W = nn.init.Normal(std = std), b = None,
                          nonlinearity = None)
     print 'conv3a', nn.layers.get_output_shape(conv3a)
 
     sum3a = SumLayer(incomings = [conv3, conv3a], coeffs = 1)
     print 'sum3a', nn.layers.get_output_shape(sum3a)
-    
+
     bn3a = BatchNormLayer(incoming = sum3a, epsilon = 0.0000000001,
-                          nonlinearity = nn.nonlinearities.rectify)    
+                          nonlinearity = nn.nonlinearities.rectify)
     print 'bn3a', nn.layers.get_output_shape(bn3a)
 
     conv3b = Conv2DLayer(incoming = bn3a, num_filters = 256, filter_size = (1, 9),
-                         stride = 1, border_mode = 'same',
+                         stride=1,
+                        pad='same',
                          W = conv3a.W, b = None,
                          nonlinearity = None)
     print 'conv3b', nn.layers.get_output_shape(conv3b)
 
     sum3b = SumLayer(incomings = [conv3, conv3b], coeffs = 1)
     print 'sum3b', nn.layers.get_output_shape(sum3b)
-    
+
     bn3b = BatchNormLayer(incoming = sum3b, epsilon = 0.0000000001,
-                          nonlinearity = nn.nonlinearities.rectify)    
+                          nonlinearity = nn.nonlinearities.rectify)
     print 'bn3b', nn.layers.get_output_shape(bn3b)
 
     conv3c = Conv2DLayer(incoming = bn3b, num_filters = 256, filter_size = (1, 9),
-                         stride = 1, border_mode = 'same',
+                         stride=1,
+                        pad='same',
                          W = conv3a.W, b = None,
                          nonlinearity = None)
     print 'conv3c', nn.layers.get_output_shape(conv3c)
 
     sum3c = SumLayer(incomings = [conv3, conv3c], coeffs = 1)
     print 'sum3c', nn.layers.get_output_shape(sum3c)
-    
+
     bn3c = BatchNormLayer(incoming = sum3c, epsilon = 0.0000000001,
-                          nonlinearity = nn.nonlinearities.rectify)    
+                          nonlinearity = nn.nonlinearities.rectify)
     print 'bn3c', nn.layers.get_output_shape(bn3c)
 
     pool3 = Pool2DLayer(incoming = bn3c, pool_size = (1, 4), stride = (1, 4))
@@ -239,7 +255,8 @@ def build_model():
     print 'drop3', nn.layers.get_output_shape(drop3)
 
     conv4 = Conv2DLayer(incoming = drop3, num_filters = 256, filter_size = (1, 1),
-                        stride = 1, border_mode = 'same',
+                        stride=1,
+                        pad='same',
                         W = nn.init.Normal(std = std),
                         nonlinearity = None)
     print 'conv4', nn.layers.get_output_shape(conv4)
@@ -249,42 +266,45 @@ def build_model():
     print 'bn4', nn.layers.get_output_shape(bn4)
 
     conv4a = Conv2DLayer(incoming = bn4, num_filters = 256, filter_size = (1, 9),
-                         stride = 1, border_mode = 'same',
+                         stride=1,
+                        pad='same',
                          W = nn.init.Normal(std = std), b = None,
                          nonlinearity = None)
     print 'conv4a', nn.layers.get_output_shape(conv4a)
 
     sum4a = SumLayer(incomings = [conv4, conv4a], coeffs = 1)
     print 'sum4a', nn.layers.get_output_shape(sum4a)
-    
+
     bn4a = BatchNormLayer(incoming = sum4a, epsilon = 0.0000000001,
-                          nonlinearity = nn.nonlinearities.rectify)    
+                          nonlinearity = nn.nonlinearities.rectify)
     print 'bn4a', nn.layers.get_output_shape(bn4a)
 
     conv4b = Conv2DLayer(incoming = bn4a, num_filters = 256, filter_size = (1, 9),
-                         stride = 1, border_mode = 'same',
+                         stride=1,
+                        pad='same',
                          W = conv4a.W, b = None,
                          nonlinearity = None)
     print 'conv4b', nn.layers.get_output_shape(conv4b)
 
     sum4b = SumLayer(incomings = [conv4, conv4b], coeffs = 1)
     print 'sum4b', nn.layers.get_output_shape(sum4b)
-    
+
     bn4b = BatchNormLayer(incoming = sum4b, epsilon = 0.0000000001,
-                          nonlinearity = nn.nonlinearities.rectify)    
+                          nonlinearity = nn.nonlinearities.rectify)
     print 'bn4b', nn.layers.get_output_shape(bn4b)
 
     conv4c = Conv2DLayer(incoming = bn4b, num_filters = 256, filter_size = (1, 9),
-                         stride = 1, border_mode = 'same',
+                         stride=1,
+                        pad='same',
                          W = conv4a.W, b = None,
                          nonlinearity = None)
     print 'conv4c', nn.layers.get_output_shape(conv4c)
 
     sum4c = SumLayer(incomings = [conv4, conv4c], coeffs = 1)
     print 'sum4c', nn.layers.get_output_shape(sum4c)
-    
+
     bn4c = BatchNormLayer(incoming = sum4c, epsilon = 0.0000000001,
-                          nonlinearity = nn.nonlinearities.rectify)    
+                          nonlinearity = nn.nonlinearities.rectify)
     print 'bn4c', nn.layers.get_output_shape(bn4c)
 
     pool4 = Pool2DLayer(incoming = bn4c, pool_size = (1, 4), stride = (1, 4))
@@ -294,7 +314,8 @@ def build_model():
     print 'drop4', nn.layers.get_output_shape(drop4)
 
     conv5 = Conv2DLayer(incoming = drop4, num_filters = 256, filter_size = (1, 1),
-                        stride = 1, border_mode = 'same',
+                        stride=1,
+                        pad='same',
                         W = nn.init.Normal(std = std),
                         nonlinearity = None)
     print 'conv5', nn.layers.get_output_shape(conv5)
@@ -304,42 +325,45 @@ def build_model():
     print 'bn5', nn.layers.get_output_shape(bn5)
 
     conv5a = Conv2DLayer(incoming = bn5, num_filters = 256, filter_size = (1, 9),
-                         stride = 1, border_mode = 'same',
+                         stride=1,
+                        pad='same',
                          W = nn.init.Normal(std = std), b = None,
                          nonlinearity = None)
     print 'conv5a', nn.layers.get_output_shape(conv5a)
 
     sum5a = SumLayer(incomings = [conv5, conv5a], coeffs = 1)
     print 'sum5a', nn.layers.get_output_shape(sum5a)
-    
+
     bn5a = BatchNormLayer(incoming = sum5a, epsilon = 0.0000000001,
-                          nonlinearity = nn.nonlinearities.rectify)    
+                          nonlinearity = nn.nonlinearities.rectify)
     print 'bn5a', nn.layers.get_output_shape(bn5a)
 
     conv5b = Conv2DLayer(incoming = bn5a, num_filters = 256, filter_size = (1, 9),
-                         stride = 1, border_mode = 'same',
+                         stride=1,
+                        pad='same',
                          W = conv5a.W, b = None,
                          nonlinearity = None)
     print 'conv5b', nn.layers.get_output_shape(conv5b)
 
     sum5b = SumLayer(incomings = [conv5, conv5b], coeffs = 1)
     print 'sum5b', nn.layers.get_output_shape(sum5b)
-    
+
     bn5b = BatchNormLayer(incoming = sum5b, epsilon = 0.0000000001,
-                          nonlinearity = nn.nonlinearities.rectify)    
+                          nonlinearity = nn.nonlinearities.rectify)
     print 'bn5b', nn.layers.get_output_shape(bn5b)
 
     conv5c = Conv2DLayer(incoming = bn5b, num_filters = 256, filter_size = (1, 9),
-                         stride = 1, border_mode = 'same',
+                         stride=1,
+                        pad='same',
                          W = conv5a.W, b = None,
                          nonlinearity = None)
     print 'conv5c', nn.layers.get_output_shape(conv5c)
 
     sum5c = SumLayer(incomings = [conv5, conv5c], coeffs = 1)
     print 'sum5c', nn.layers.get_output_shape(sum5c)
-    
+
     bn5c = BatchNormLayer(incoming = sum5c, epsilon = 0.0000000001,
-                          nonlinearity = nn.nonlinearities.rectify)    
+                          nonlinearity = nn.nonlinearities.rectify)
     print 'bn5c', nn.layers.get_output_shape(bn5c)
 
     pool5 = Pool2DLayer(incoming = bn5c, pool_size = (1, 2), stride = (1, 2))
@@ -355,7 +379,7 @@ def build_model():
 def build_train_valid(l_out):
     params = nn.layers.get_all_params(l_out, regularizable = True)
     wc_term = 0.5 * sum(T.sum(param ** 2) for param in params)
-    
+
     x_batch = T.tensor4('x', theano.config.floatX)
     y_batch = T.matrix('y', 'int32')
     train_output = nn.layers.get_output(l_out, x_batch)
@@ -378,8 +402,8 @@ def build_train_valid(l_out):
     iter_train = theano.function([idx], [train_loss, train_output],
                                  givens = givens,
                                  updates = updates)
-    
+
     givens = {x_batch: x_shared[idx * batch_size:(idx + 1) * batch_size]}
     iter_valid = theano.function([idx], valid_output, givens = givens)
-    
+
     return x_shared, y_shared, idx, lr, iter_train, iter_valid
