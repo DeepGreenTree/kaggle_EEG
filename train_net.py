@@ -52,12 +52,6 @@ def main():
     if not os.path.exists(resume_path):
         os.mkdir(resume_path)
 
-    # # Parse command line for testing flag
-    # test_flag = True
-    # if sys.argv[-1] == 'no_test':
-    #     test_flag = False
-    #     print 'no_test'
-
     # Resume training if specified
     if resume_file:
         if not os.path.exists(resume_file):
@@ -71,22 +65,6 @@ def main():
         resume_path = os.path.join('models', model_name, exp_id)
         if not os.path.exists(resume_path):
             os.mkdir(resume_path)
-
-    # # resume training if specified
-    # if (test_flag is True and len(sys.argv) > 2) or \
-    #     (test_flag is False and len(sys.argv) > 3):
-    #     print 'resume'
-    #     resume_file = sys.argv[2]
-    #     if not os.path.exists(resume_file):
-    #         sys.exit('Resume_file does not exist')
-    #     resume_data = np.load(resume_file)
-    #     exp_id = resume_data['exp_id']
-    #     resume_path, _ = os.path.split(resume_file)
-    # else:
-    #     exp_id = '%s' % time.strftime('%Y%m%d-%H%M%S', time.localtime())
-    #     resume_path = os.path.join('models', model_name, exp_id)
-    #     if not os.path.exists(resume_path):
-    #         os.mkdir(resume_path)
 
     # Build the model
     print
