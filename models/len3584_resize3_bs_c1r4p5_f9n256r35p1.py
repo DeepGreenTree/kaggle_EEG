@@ -1,3 +1,6 @@
+"""
+Modified by Bruce Sharpe
+"""
 import numpy as np
 import theano
 import theano.tensor as T
@@ -71,7 +74,6 @@ test_data_params = {'section': 'test',
                     'test_lens': [3584],
                     'test_valid': False,
                     }
-
 
 batch_size = 64
 momentum = 0.9
@@ -153,7 +155,6 @@ def build_model():
                          W = nn.init.Normal(std = std), b = None,
                          nonlinearity = None)
     print 'conv2a', nn.layers.get_output_shape(conv2a)
-
     sum2a = SumLayer(incomings = [conv2, conv2a], coeffs = 1)
     print 'sum2a', nn.layers.get_output_shape(sum2a)
 
@@ -377,6 +378,8 @@ def build_model():
     return l_out
 
 def build_train_valid(l_out):
+
+    # Compute regularization expression (?)
     params = nn.layers.get_all_params(l_out, regularizable = True)
     wc_term = 0.5 * sum(T.sum(param ** 2) for param in params)
 
