@@ -3,3 +3,5 @@
 *.log
 data/
 models/*/
+.idea/
+.vscode/launch.json
