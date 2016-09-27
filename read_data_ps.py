@@ -59,9 +59,9 @@ for sub in np.arange(n_subs):
 # Save
 np.save('eeg_train.npy', [data, label])
 
-#########
-# Train #
-#########
+########
+# Test #
+########
 
 csvdir = 'data/test'
 n_subs = 12
