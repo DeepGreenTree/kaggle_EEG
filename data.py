@@ -24,7 +24,7 @@ double cor_loc, diff;
 int x;
 for(int j = 0; j < out_length - 1; j++){
     cor_loc = j * resize_ratio;
-    x = (int)cor_loc; 
+    x = (int)cor_loc;
     diff = cor_loc - x;
     for(int i = 0; i < 32; i++) {
         data[j * 32 + i] = diff * input_data[(x + 1) * 32 + i] + (1 - diff) * input_data[x * 32 + i];
@@ -41,14 +41,14 @@ Py_XDECREF(out_array);
 def inline_zoom(input_data, out_length):
     """
     inline_zoom: use C inline code to resize the input data
-    parameters: 
+    parameters:
         input_data: the data to be resize, shape should be [length x 32]
         out_length: the target length to be resized
     """
     assert(out_length >= 1)
     in_length = input_data.shape[0]
     input_data = np.require(input_data, requirements='C')
-    output_array = scipy.weave.inline(c_code, 
+    output_array = scipy.weave.inline(c_code,
         ["input_data", "in_length", "out_length"],
     )
 
@@ -59,7 +59,7 @@ def bootstrap(y_true, probs):
     bootstrap: bootstrap the training data, mainly used to increase volume of hard negative examples for training
     parameters:
         y_true: ground truth of training data
-        probs: predictions of the model 
+        probs: predictions of the model
     """
     global  neg_pool
 
@@ -92,7 +92,7 @@ def init_sample_cells(labels, events, train_series, valid_series):
     parameters:
         labels: ground truth of all the data for train and valid
         events: list of target events for training
-        train_series: list of series for training 
+        train_series: list of series for training
         valid_series: list of series for validation
     """
     global pos_cells_train
@@ -114,16 +114,16 @@ def load(data_path):
     """
     data, labels = np.load(data_path)
     return data, labels
-    
+
 def sample_cells_gen(labels, events):
     """
-    sample_cells_gen: generate all the incides of positive and negative samples
+    sample_cells_gen: generate all the indices of positive and negative samples
     parameters:
         labels: ground truth of samples
         events: list of target events for training
     """
     num_subs = labels.shape[0]
-    num_series = labels.shape[1]    
+    num_series = labels.shape[1]
     pos_cells = np.zeros((0, 3), 'int32')
     neg_cells = np.zeros((0, 3), 'int32')
     for sub in np.arange(num_subs):
@@ -132,13 +132,13 @@ def sample_cells_gen(labels, events):
             pos_idcs = np.arange(len(l))[l[:, events].sum(axis = 1) > 0]
             neg_idcs = np.asarray(
                 list(set(np.arange(len(l))).difference(set(pos_idcs))),
-                'int32')            
+                'int32')
             pos = np.zeros((len(pos_idcs), 3), 'int32')
             pos[:, 0] = sub
             pos[:, 1] = series
             pos[:, 2] = pos_idcs
             pos_cells = np.concatenate((pos_cells, pos), axis = 0)
-            
+
             neg = np.zeros((len(neg_idcs), 3), 'int32')
             neg[:, 0] = sub
             neg[:, 1] = series
@@ -152,13 +152,13 @@ def random_chunk_gen_fun(data, labels, events, params):
     parameters:
         data: EEG data from which to generate the chunks
         labels: labels corresponding to the input data
-        events: list of target events 
+        events: list of target events
         params: parameter dictionary for generation
     """
     global neg_pool
     global hard_ratio
     global easy_mode
-    
+
     channels = params['channels']
     length = params['length']
     num_events = len(events)
@@ -190,12 +190,12 @@ def random_chunk_gen_fun(data, labels, events, params):
             neg_pool[:easy_size] = nr.randint(0, len(neg_cells), (easy_size,))\
                                    + len(pos_cells)
     ####################################
-        
+
     for i in np.arange(num_chunks):
         x_chunk = np.zeros((chunk_size, channels, 1, length), 'float32')
         y_chunk = np.zeros((chunk_size, num_events), 'int32')
-        
-        pos_chunk_idcs = nr.randint(0, len(pos_cells), (pos_size,))            
+
+        pos_chunk_idcs = nr.randint(0, len(pos_cells), (pos_size,))
         #########################################
         if 'bootstrap' in params and params['bootstrap'] == True:
             neg_chunk_idcs = np.copy(neg_pool[nr.randint(0, len(neg_pool), (neg_size,))])
@@ -203,10 +203,10 @@ def random_chunk_gen_fun(data, labels, events, params):
             neg_chunk_idcs = nr.randint(0, len(neg_cells), (neg_size,))\
                              + len(pos_cells)
         #########################################
-        
+
         chunk_idcs = np.concatenate((pos_chunk_idcs, neg_chunk_idcs))
         nr.shuffle(chunk_idcs)
-            
+
         for j, idx in enumerate(chunk_idcs):
             sub = sample_cells[idx, 0]
             series = sample_cells[idx, 1]
@@ -242,18 +242,18 @@ def random_chunk_gen_fun(data, labels, events, params):
 
         yield x_chunk, y_chunk, chunk_size
 
-def fixed_chunk_gen_fun(data, labels, events, params):    
+def fixed_chunk_gen_fun(data, labels, events, params):
     """
     fixed_chunk_gen_fun: function to generate chunks with fixed order
     parameters:
         data: EEG data from which to generate the chunks
         labels: labels corresponding to the input data
-        events: list of target events 
+        events: list of target events
         params: parameter dictionary for generation
     """
     global bootstrap_idcs
     global offset
-    
+
     channels = params['channels']
     length = params['length']
     num_events = len(events)
@@ -285,7 +285,7 @@ def fixed_chunk_gen_fun(data, labels, events, params):
     sample_cells = np.concatenate((pos_cells, neg_cells), axis = 0)
     num_cells = len(sample_cells)
 
-    num_chunks = int(np.ceil(float(num_cells) / chunk_size))    
+    num_chunks = int(np.ceil(float(num_cells) / chunk_size))
     last_chunk_length = np.mod(num_cells, chunk_size)
     if last_chunk_length == 0:
         last_chunk_length = chunk_size
@@ -300,12 +300,12 @@ def fixed_chunk_gen_fun(data, labels, events, params):
         else:
             chunk_length = last_chunk_length
             idcs[chunk_length:] = 0
-            
+
         for j, idx in enumerate(idcs):
             sub = sample_cells[idx, 0]
             series = sample_cells[idx, 1]
             t = sample_cells[idx, 2]
-            
+
             # Copy the history data into sample. The stop critirion for copy is smaller than t+1
             sample = np.copy(data[sub, series][max((0, t - length + 1)):t + 1, :])
             if params['preprocess'] == 'per_sample_mean':
@@ -324,17 +324,17 @@ def fixed_chunk_gen_fun(data, labels, events, params):
                                          sample], axis = 0)
             x_chunk[j] = np.asarray(sample, 'float32').T.reshape((channels, 1, length))
             y_chunk[j, :] = labels[sub, series][t, events]
-            
+
         yield x_chunk, y_chunk, chunk_length
 
 ###############################################################################################
-def test_valid_chunk_gen_fun(data, labels, events, params):       
+def test_valid_chunk_gen_fun(data, labels, events, params):
     """
     test_valid_chunk_gen_fun: function to generate chunks for validation set with series-major sequencial order
     parameters:
         data: EEG data from which to generate the chunks
         labels: labels corresponding to the input data
-        events: list of target events 
+        events: list of target events
         params: parameter dictionary for generation
     """
     channels = params['channels']
@@ -367,15 +367,15 @@ def test_valid_chunk_gen_fun(data, labels, events, params):
     if 'test_lens' in params:
         lens = params['test_lens']
         num_lens = len(lens)
-        
+
     temp = np.zeros((0, 4), 'int32')
     for s_len in lens:
         temp = np.concatenate((temp,
                                np.concatenate((sample_cells, s_len * np.ones((len(sample_cells), 1), 'int32')), axis = 1)),
                               axis = 0)
-    sample_cells = temp    
+    sample_cells = temp
     num_cells = len(sample_cells)
-    num_chunks = int(np.ceil(float(num_cells) / chunk_size))    
+    num_chunks = int(np.ceil(float(num_cells) / chunk_size))
     last_chunk_length = np.mod(num_cells, chunk_size)
     if last_chunk_length == 0:
         last_chunk_length = chunk_size
@@ -391,13 +391,13 @@ def test_valid_chunk_gen_fun(data, labels, events, params):
         else:
             chunk_length = last_chunk_length
             idcs[chunk_length:] = 0
-            
+
         for j, idx in enumerate(idcs):
             sub = sample_cells[idx, 0]
             series = sample_cells[idx, 1]
             t = sample_cells[idx, 2]
             s_len = sample_cells[idx, 3]
-            
+
             # Copy the history data into sample. The stop critirion for copy is smaller than t+1
             sample = np.copy(data[sub, series][max((0, t - s_len + 1)):t + 1, :])
             if params['preprocess'] == 'per_sample_mean':
@@ -421,17 +421,17 @@ def test_valid_chunk_gen_fun(data, labels, events, params):
 
             x_chunk[j] = np.asarray(sample, 'float32').T.reshape((channels, 1, length))
             y_chunk[j, :] = labels[sub, series][t, events]
-            
+
         yield x_chunk, y_chunk, chunk_length
 ###############################################################################################
 
-def sequence_chunk_gen_fun(data, labels, events, params):       
+def sequence_chunk_gen_fun(data, labels, events, params):
     """
     sequence_chunk_gen_fun: function to generate chunks for test set with sequencial order
     parameters:
         data: EEG data from which to generate the chunks
         labels: labels corresponding to the input data
-        events: list of target events 
+        events: list of target events
         params: parameter dictionary for generation
     """
     channels = params['channels']
@@ -461,15 +461,15 @@ def sequence_chunk_gen_fun(data, labels, events, params):
     if 'test_lens' in params:
         lens = params['test_lens']
         num_lens = len(lens)
-        
+
     temp = np.zeros((0, 4), 'int32')
     for s_len in lens:
         temp = np.concatenate((temp,
                                np.concatenate((sample_cells, s_len * np.ones((len(sample_cells), 1), 'int32')), axis = 1)),
                               axis = 0)
-    sample_cells = temp    
+    sample_cells = temp
     num_cells = len(sample_cells)
-    num_chunks = int(np.ceil(float(num_cells) / chunk_size))    
+    num_chunks = int(np.ceil(float(num_cells) / chunk_size))
     last_chunk_length = np.mod(num_cells, chunk_size)
     if last_chunk_length == 0:
         last_chunk_length = chunk_size
@@ -485,13 +485,13 @@ def sequence_chunk_gen_fun(data, labels, events, params):
         else:
             chunk_length = last_chunk_length
             idcs[chunk_length:] = 0
-            
+
         for j, idx in enumerate(idcs):
             sub = sample_cells[idx, 0]
             series = sample_cells[idx, 1]
             t = sample_cells[idx, 2]
             s_len = sample_cells[idx, 3]
-            
+
             # Copy the history data into sample. The stop critirion for copy is smaller than t+1
             sample = np.copy(data[sub, series][max((0, t - s_len + 1)):t + 1, :])
             if params['preprocess'] == 'per_sample_mean':
@@ -515,7 +515,7 @@ def sequence_chunk_gen_fun(data, labels, events, params):
 
             x_chunk[j] = np.asarray(sample, 'float32').T.reshape((channels, 1, length))
             y_chunk[j, :] = labels[sub, series][t, events]
-            
+
         yield x_chunk, y_chunk, chunk_length
 
 def chunk_gen(chunk_gen_fun):
