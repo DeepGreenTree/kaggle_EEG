@@ -20,7 +20,10 @@ for k in np.arange(num_classes):
     count = 0
     for i in np.arange(len(results[k])):
         st = time.time()
-        l, d = np.load(os.path.join(results_dir, 'test_' + results[k][i] + '.npy'))
+        try:
+            l, d = np.load(os.path.join(results_dir, 'test_' + results[k][i] + '.npy'))
+        except IOError:
+            continue
 
         if count == 0:
             labels = l
